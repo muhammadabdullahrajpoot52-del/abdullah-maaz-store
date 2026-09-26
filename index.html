@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abdullah and Maaz Store</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-red-600 text-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-store"></i> Abdullah & Maaz Store
+            </h1>
+            <div class="flex items-center gap-4">
+                <button onclick="openCart()" class="bg-white text-red-600 px-4 py-2 rounded-lg font-semibold flex items-center gap-2 shadow hover:bg-gray-100">
+                    <i class="fa-solid fa-cart-shopping"></i> Cart (<span id="cart-count">0</span>)
+                </button>
+                <button onclick="openAdminLogin()" class="bg-black text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 shadow hover:bg-gray-800">
+                    <i class="fa-solid fa-lock"></i> Admin Panel
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner (Editable Text & Image) -->
+    <section class="bg-cover bg-center text-white py-20" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80');">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-4xl md:text-6xl font-extrabold mb-4">Fresh Food, Groceries & More!</h2>
+            <p class="text-lg md:text-xl mb-6">Like Metro & Chase Up – Delivered right to your doorstep.</p>
+            <a href="#products" class="bg-red-600 text-white px-6 py-3 rounded-full font-bold text-lg hover:bg-red-700 transition">Shop Now</a>
+        </div>
+    </section>
+
+    <!-- Main Products Section -->
+    <main id="products" class="container mx-auto px-4 py-10">
+        <h3 class="text-3xl font-bold text-gray-800 mb-8 border-b-4 border-red-600 pb-2 inline-block">Our Products</h3>
+        
+        <!-- Product Grid -->
+        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Products will be loaded dynamically via JavaScript -->
+        </div>
+    </main>
+
+    <!-- Cart Drawer Modal -->
+    <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex justify-end">
+        <div class="bg-white w-full max-w-md h-full p-6 flex flex-col justify-between shadow-2xl">
+            <div>
+                <div class="flex justify-between items-center border-b pb-4">
+                    <h3 class="text-2xl font-bold text-gray-800">Your Cart</h3>
+                    <button onclick="closeCart()" class="text-gray-500 hover:text-black text-xl font-bold">&times;</button>
+                </div>
+                <div id="cart-items" class="py-4 space-y-4 max-h-[50vh] overflow-y-auto">
+                    <!-- Cart Items will show here -->
+                </div>
+            </div>
+            <div class="border-t pt-4">
+                <div class="flex justify-between text-lg font-bold mb-4">
+                    <span>Total:</span>
+                    <span id="cart-total">Rs. 0</span>
+                </div>
+                <button onclick="openCheckout()" class="w-full bg-red-600 text-white py-3 rounded-lg font-bold hover:bg-red-700">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md p-6 rounded-lg shadow-xl">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Checkout Order</h3>
+            <form id="checkout-form" onsubmit="submitOrder(event)" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Full Name</label>
+                    <input type="text" id="cust-name" required class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:border-red-600">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Phone Number</label>
+                    <input type="tel" id="cust-phone" required class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:border-red-600">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Delivery Address</label>
+                    <textarea id="cust-address" required rows="3" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:border-red-600"></textarea>
+                </div>
+                <div class="flex gap-4">
+                    <button type="button" onclick="closeCheckout()" class="w-1/2 bg-gray-300 text-gray-700 py-2 rounded-lg font-bold">Cancel</button>
+                    <button type="submit" class="w-1/2 bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700">Confirm Order</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-login-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm p-6 rounded-lg shadow-xl">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Admin Login</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Username</label>
+                    <input type="text" id="admin-user-input" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:border-red-600">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Password</label>
+                    <!-- Password field hidden properly using type="password" -->
+                    <input type="password" id="admin-pass-input" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:border-red-600">
+                </div>
+                <div class="flex gap-4">
+                    <button onclick="closeAdminLogin()" class="w-1/2 bg-gray-300 text-gray-700 py-2 rounded-lg font-bold">Cancel</button>
+                    <button onclick="verifyAdmin()" class="w-1/2 bg-black text-white py-2 rounded-lg font-bold hover:bg-gray-800">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Dashboard Modal -->
+    <div id="admin-panel-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-4xl h-[80vh] p-6 rounded-lg shadow-xl flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-center border-b pb-4 mb-4">
+                    <h3 class="text-2xl font-bold text-gray-800"><i class="fa-solid fa-gauge"></i> Admin Dashboard - Customer Orders</h3>
+                    <button onclick="closeAdminPanel()" class="text-gray-500 hover:text-black text-xl font-bold">&times;</button>
+                </div>
+                <div class="overflow-y-auto max-h-[55vh]">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-200 text-gray-700">
+                                <th class="p-2 border">Order ID</th>
+                                <th class="p-2 border">Customer</th>
+                                <th class="p-2 border">Phone & Address</th>
+                                <th class="p-2 border">Items</th>
+                                <th class="p-2 border">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-orders-list">
+                            <!-- Orders will load here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="border-t pt-4 flex justify-between items-center">
+                <button onclick="clearOrders()" class="bg-red-600 text-white px-4 py-2 rounded font-bold hover:bg-red-700">Clear All Orders</button>
+                <button onclick="closeAdminPanel()" class="bg-gray-600 text-white px-4 py-2 rounded font-bold hover:bg-gray-700">Close Panel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-6 mt-10">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2026 Abdullah and Maaz Store. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Product List (You can change names, prices, and images easily here)
+        const products = [
+            { id: 1, name: "Mixed Fresh Fruits", price: 350, image: "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=400&q=80" },
+            { id: 2, name: "Special Chicken Biryani", price: 250, image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=400&q=80" },
+            { id: 3, name: "Chicken Pulao", price: 230, image: "https://images.unsplash.com/photo-1633964913295-ceb43826e7c9?auto=format&fit=crop&w=400&q=80" },
+            { id: 4, name: "Hot Soup", price: 180, image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=400&q=80" },
+            { id: 5, name: "Boiled Eggs (2 pcs)", price: 60, image: "https://images.unsplash.com/photo-1516762689617-e16ffcef467d?auto=format&fit=crop&w=400&q=80" },
+            { id: 6, name: "Juicy Burger", price: 300, image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=400&q=80" },
+            { id: 7, name: "Fried Fish", price: 450, image: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=400&q=80" },
+            { id: 8, name: "Ice Cream Cup", price: 120, image: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=400&q=80" },
+            { id: 9, name: "Ice Cream Cone", price: 100, image: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=400&q=80" },
+            { id: 10, name: "Fresh Juice", price: 150, image: "https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=400&q=80" },
+            { id: 11, name: "Pepsi", price: 90, image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=400&q=80" },
+            { id: 12, name: "Coca Cola", price: 90, image: "https://images.unsplash.com/photo-1554866585-cd94860890b7?auto=format&fit=crop&w=400&q=80" },
+            { id: 13, name: "Popcorn", price: 100, image: "https://images.unsplash.com/photo-1578849278619-e73505e9610f?auto=format&fit=crop&w=400&q=80" },
+            { id: 14, name: "French Fries", price: 130, image: "https://images.unsplash.com/photo-1576107232684-1279f390859f?auto=format&fit=crop&w=400&q=80" },
+            { id: 15, name: "Hotdog & Sausages", price: 220, image: "https://images.unsplash.com/photo-1619740455993-9e612b1af08a?auto=format&fit=crop&w=400&q=80" },
+            { id: 16, name: "Special Tea", price: 50, image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80" },
+            { id: 17, name: "Green Tea", price: 40, image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80" },
+            { id: 18, name: "Traditional Zarda", price: 200, image: "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?auto=format&fit=crop&w=400&q=80" },
+            { id: 19, name: "Fruit Chaat", price: 160, image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80" },
+            { id: 20, name: "Separate Seasonal Fruits", price: 300, image: "https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=400&q=80" }
+        ];
+
+        let cart = [];
+
+        // Render products on the webpage
+        function loadProducts() {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+            products.forEach(product => {
+                grid.innerHTML += `
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden flex flex-col justify-between hover:shadow-lg transition">
+                        <img src="${product.image}" alt="${product.name}" class="h-48 w-full object-cover">
+                        <div class="p-4 flex flex-col flex-grow justify-between">
+                            <div>
+                                <h4 class="font-bold text-lg text-gray-800">${product.name}</h4>
+                                <p class="text-red-600 font-semibold mt-1">Rs. ${product.price}</p>
+                            </div>
+                            <button onclick="addToCart(${product.id})" class="mt-4 bg-red-600 text-white w-full py-2 rounded font-semibold hover:bg-red-700 transition">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            cart.push(product);
+            updateCartCount();
+            alert(product.name + " added to your cart!");
+        }
+
+        function updateCartCount() {
+            document.getElementById('cart-count').innerText = cart.length;
+        }
+
+        function openCart() {
+            const container = document.getElementById('cart-items');
+            container.innerHTML = '';
+            let total = 0;
+            
+            if(cart.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-4">Your cart is empty.</p>';
+            } else {
+                cart.forEach((item, index) => {
+                    total += item.price;
+                    container.innerHTML += `
+                        <div class="flex justify-between items-center border-b pb-2">
+                            <div>
+                                <h5 class="font-semibold">${item.name}</h5>
+                                <p class="text-sm text-gray-600">Rs. ${item.price}</p>
+                            </div>
+                            <button onclick="removeFromCart(${index})" class="text-red-600 hover:text-red-800"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById('cart-total').innerText = 'Rs. ' + total;
+            document.getElementById('cart-modal').classList.remove('hidden');
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartCount();
+            openCart();
+        }
+
+        function closeCart() {
+            document.getElementById('cart-modal').classList.add('hidden');
+        }
+
+        function openCheckout() {
+            if(cart.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+            closeCart();
+            document.getElementById('checkout-modal').classList.remove('hidden');
+        }
+
+        function closeCheckout() {
+            document.getElementById('checkout-modal').classList.add('hidden');
+        }
+
+        function submitOrder(e) {
+            e.preventDefault();
+            const name = document.getElementById('cust-name').value;
+            const phone = document.getElementById('cust-phone').value;
+            const address = document.getElementById('cust-address').value;
+
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            let itemsList = cart.map(item => item.name).join(', ');
+
+            let newOrder = {
+                id: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
+                name: name,
+                phone: phone,
+                address: address,
+                items: itemsList,
+                total: 'Rs. ' + total
+            };
+
+            // Save order to LocalStorage so Admin Panel can see it
+            let orders = JSON.parse(localStorage.getItem('store_orders')) || [];
+            orders.push(newOrder);
+            localStorage.setItem('store_orders', JSON.stringify(orders));
+
+            alert("Order placed successfully! Thank you for shopping with Abdullah and Maaz Store.");
+            cart = [];
+            updateCartCount();
+            closeCheckout();
+            document.getElementById('checkout-form').reset();
+        }
+
+        // Admin Panel Functions
+        function openAdminLogin() {
+            document.getElementById('admin-login-modal').classList.remove('hidden');
+        }
+
+        function closeAdminLogin() {
+            document.getElementById('admin-login-modal').classList.add('hidden');
+        }
+
+        function verifyAdmin() {
+            let userInput = document.getElementById('admin-user-input').value;
+            let passInput = document.getElementById('admin-pass-input').value;
+
+            // Credentials check matching your requirements
+            if(userInput === "Abdullah and Maaz store" && passInput === "mah123") {
+                closeAdminLogin();
+                document.getElementById('admin-user-input').value = '';
+                document.getElementById('admin-pass-input').value = '';
+                openAdminPanel();
+            } else {
+                alert("Incorrect Username or Password!");
+            }
+        }
+
+        function openAdminPanel() {
+            let orders = JSON.parse(localStorage.getItem('store_orders')) || [];
+            let tbody = document.getElementById('admin-orders-list');
+            tbody.innerHTML = '';
+
+            if(orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">No orders received yet.</td></tr>`;
+            } else {
+                orders.forEach(order => {
+                    tbody.innerHTML += `
+                        <tr class="border-b">
+                            <td class="p-2 border font-bold text-red-600">${order.id}</td>
+                            <td class="p-2 border">${order.name}</td>
+                            <td class="p-2 border">${order.phone}<br><small class="text-gray-600">${order.address}</small></td>
+                            <td class="p-2 border">${order.items}</td>
+                            <td class="p-2 border font-bold">Rs. ${order.total}</td>
+                        </tr>
+                    `;
+                });
+            }
+            document.getElementById('admin-panel-modal').classList.remove('hidden');
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('admin-panel-modal').classList.add('hidden');
+        }
+
+        function clearOrders() {
+            if(confirm("Are you sure you want to clear all orders?")) {
+                localStorage.removeItem('store_orders');
+                openAdminPanel();
+            }
+        }
+
+        // Initialize products on load
+        window.onload = loadProducts;
+    </script>
+</body>
+</html>
